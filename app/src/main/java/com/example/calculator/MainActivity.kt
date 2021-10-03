@@ -118,7 +118,15 @@ class MainActivity : AppCompatActivity() {
         update()
     }
     fun dele(){
-
+      var temp =displ.text.toString()
+      if(temp[temp.count()-1].toIntOrNull()==null||temp[temp.count()-1].equals(".")){
+        if(num){
+          num1.removelast()
+        }else{
+          num2.removelast()
+        }
+      }else op="";num=true
+      update()
     }
 
     fun resu(){
