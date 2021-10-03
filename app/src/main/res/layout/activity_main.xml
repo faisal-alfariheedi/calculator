@@ -14,7 +14,7 @@
         android:background="#468F5B"
         android:gravity="end"
         android:padding="16dp"
-        android:text="0"
+        android:text="0.0"
         android:textColor="@android:color/white"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
