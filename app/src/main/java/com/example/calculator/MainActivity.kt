@@ -1,5 +1,6 @@
 package com.example.calculator
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var num2:ArrayList<Char>
     var op:String =""
     var cont:Boolean=true
+    var num1p: Boolean=true
+    var num2p: Boolean=true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -80,19 +83,28 @@ class MainActivity : AppCompatActivity() {
         cl=findViewById(R.id.cle)
 
 
+
     }
 
-
+    ////////////////adds numbers
     fun addnum(nu: Char){
 
         if(num){
-            if(num1.isNotEmpty())if(num1[0].equals('0'))num1.clear()
-            num1.add(nu)
+            if(num1.isNotEmpty())if(num1[0] == '0')num1.clear()
+            if(num1p&& nu == '.') {
+                num1.add(nu)
+                num1p = false
+            }
+            if(nu != '.')num1.add(nu)
 
         }else{
             if(cont) {
-                if(num2.isNotEmpty())if(num2[0].equals('0'))num2.clear()
-                num2.add(nu)
+                if(num2.isNotEmpty())if(num2[0] == '0')num2.clear()
+                if(num2p&& nu == '.') {
+                    num2.add(nu)
+                    num2p = false
+                }
+                if(nu != '.')num2.add(nu)
             }else{
                 Toast.makeText(this,"choose an operation first",Toast.LENGTH_SHORT).show()
             }
@@ -100,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         update()
     }
 
+    /////////////// make plus or negative
     fun pmc(){
 
         if(num){
@@ -117,18 +130,26 @@ class MainActivity : AppCompatActivity() {
         }
         update()
     }
+
+    /////////////// delete last entre
     fun dele(){
       var temp =displ.text.toString()
-      if(temp[temp.count()-1].toIntOrNull()==null||temp[temp.count()-1].equals(".")){
-        if(num){
-          num1.removelast()
-        }else{
-          num2.removelast()
-        }
-      }else op="";num=true
-      update()
+      if(temp!="0.0") {
+          if (temp.last().digitToIntOrNull() != null || temp.last().equals('.')) {
+              if (num) {
+                  num1.removeLast()
+                  if(temp.last()=='.')num1p=true
+              } else {
+                  num2.removeLast()
+                  if(temp.last()=='.')num2p=true
+              }
+
+          } else op = "";num = true
+          update()
+      }
     }
 
+    /////////////// calculate result and put result on num1
     fun resu(){
         var a:Int=0
         if(!num2.isEmpty()) {
@@ -176,11 +197,54 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //////////// updates the display
     fun update(){
-//        displ.text="$num1$op$num2"
+
         displ.text= "${TextUtils.join("",num1)}${TextUtils.join("",op.toCharArray().toMutableList())}${TextUtils.join("",num2)}"
         if(displ.text.isNullOrEmpty()){
             displ.text="0.0"
         }
     }
+
+    /////////// data guardian from the rotation monster
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("num",num)
+        outState.putCharArray("num1",num1.toCharArray())
+        outState.putCharArray("num2",num2.toCharArray())
+        outState.putString("op",op)
+        outState.putBoolean("cont",cont)
+        outState.putBoolean("num1p",num1p)
+        outState.putBoolean("num2p",num2p)
+    }
+//    var num:Boolean=true
+//    lateinit var num1: ArrayList<Char>
+//    lateinit var num2:ArrayList<Char>
+//    var op:String =""
+//    var cont:Boolean=true
+//    var num1p: Boolean=true
+//    var num2p: Boolean=true
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        num=savedInstanceState.getBoolean("num")
+        op= savedInstanceState.getString("op")!!
+        cont=savedInstanceState.getBoolean("cont")
+        num1p=savedInstanceState.getBoolean("num1p")
+        num2p=savedInstanceState.getBoolean("num2p")
+        var s=savedInstanceState.getCharArray("num1")
+        if (s != null) {
+            for (i in s){
+            num1.add(i)
+            }
+        }
+        s=savedInstanceState.getCharArray("num2")
+        if (s != null) {
+            for (i in s){
+                num2.add(i)
+            }
+        }
+        update()
+    }
+
 }
